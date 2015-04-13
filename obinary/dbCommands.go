@@ -821,7 +821,7 @@ func SQLCommand(dbc *DBClient, sql string, params ...string) (retval string, doc
 			if err != nil {
 				return "", nil, oerror.NewTrace(err)
 			}
-			ogl.Printf("serializedRec from 'a' return type: %v\n", serializedRec)
+			// ogl.Printf("serializedRec from 'a' return type: %v\n", serializedRec)
 			retval = string(serializedRec)
 			if err != nil {
 				return "", nil, oerror.NewTrace(err)
