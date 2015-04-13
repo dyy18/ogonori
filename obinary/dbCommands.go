@@ -763,7 +763,7 @@ func SQLCommand(dbc *DBClient, sql string, params ...string) (retval string, doc
 		}
 
 		resultType := rune(resType)
-		ogl.Printf("resultType for SQLCommand: %v (%s)\n", resultType, string(rune(resultType)))
+		// ogl.Printf("resultType for SQLCommand: %v (%s)\n", resultType, string(rune(resultType)))
 
 		if resultType == 'n' { // null result
 			// do nothing - anything need to be done here?
