@@ -332,8 +332,9 @@ func (s *session) sendCmd(op byte, wr func(*rw.Writer) error, rd func(*rw.Reader
 
 func (c *Client) getCurrDB() *Database {
 	c.currmu.RLock()
-	defer c.currmu.RUnlock()
-	return c.currdb
+	db := c.currdb
+	c.currmu.RUnlock()
+	return db
 }
 
 // GetCurDB returns database metadata
@@ -355,7 +356,9 @@ func (c *Client) Close() error {
 	}
 	if db := c.getCurrDB(); db != nil {
 		// ignoring any error here, since closing the conx also terminates the session
-		db.Close()
+		if err := db.Close(); err != nil {
+			return err
+		}
 	}
 	return c.conn.Close()
 }
