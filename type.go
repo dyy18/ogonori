@@ -12,32 +12,30 @@ type OType byte
 
 // in alignment with: http://orientdb.com/docs/last/Types.html
 const (
-	BOOLEAN OType = iota
-	INTEGER
-	SHORT
-	LONG
-	FLOAT
-	DOUBLE
-	DATETIME
-	STRING
-	BINARY // means []byte
-	EMBEDDED
-	EMBEDDEDLIST
-	EMBEDDEDSET
-	EMBEDDEDMAP
-	LINK
-	LINKLIST
-	LINKSET
-	LINKMAP
-	BYTE
-	TRANSIENT
-	DATE
-	CUSTOM
-	DECIMAL
-	LINKBAG
-	ANY
-)
-const (
+	BOOLEAN      OType = 0
+	INTEGER      OType = 1
+	SHORT        OType = 2
+	LONG         OType = 3
+	FLOAT        OType = 4
+	DOUBLE       OType = 5
+	DATETIME     OType = 6
+	STRING       OType = 7
+	BINARY       OType = 8 // means []byte
+	EMBEDDED     OType = 9
+	EMBEDDEDLIST OType = 10
+	EMBEDDEDSET  OType = 11
+	EMBEDDEDMAP  OType = 12
+	LINK         OType = 13
+	LINKLIST     OType = 14
+	LINKSET      OType = 15
+	LINKMAP      OType = 16
+	BYTE         OType = 17
+	TRANSIENT    OType = 18
+	DATE         OType = 19
+	CUSTOM       OType = 20
+	DECIMAL      OType = 21
+	LINKBAG      OType = 22
+	ANY          OType = 23
 	UNKNOWN OType = 255 // driver addition
 )
 
