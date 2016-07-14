@@ -79,71 +79,6 @@ func Dial(addr string) (*Client, error) {
 	return cli, nil
 }
 
-func newConnPool(size int, dial func() (DBSession, error)) *connPool {
-	if size <= 0 {
-		size = poolLimit
-	}
-	p := &connPool{
-		dial: dial,
-		ch:   make(chan DBSession, size),
-		toks: make(chan struct{}, size),
-	}
-	for i := 0; i < size; i++ {
-		p.toks <- struct{}{}
-	}
-	return p
-}
-
-type connPool struct {
-	dial func() (DBSession, error)
-	ch   chan DBSession
-	toks chan struct{}
-}
-
-func (p *connPool) getConn() (DBSession, error) {
-	select {
-	case conn := <-p.ch:
-		return conn, nil
-	case <-p.toks:
-		if p.dial == nil {
-			return nil, nil
-		}
-		conn, err := p.dial()
-		if err != nil {
-			return nil, err
-		}
-		return conn, nil
-	}
-}
-func (p *connPool) putConn(conn DBSession) {
-	select {
-	case p.ch <- conn:
-	default:
-		select {
-		case p.toks <- struct{}{}:
-		default:
-		}
-		conn.Close()
-	}
-}
-func (p *connPool) clear() {
-loop:
-	for {
-		select {
-		case conn := <-p.ch:
-			if conn != nil {
-				conn.Close()
-			}
-		case <-p.toks:
-		default:
-			break loop
-		}
-	}
-	for len(p.toks) < cap(p.toks) {
-		p.toks <- struct{}{}
-	}
-}
-
 // Client represents connection to OrientDB server. It is safe for concurrent use.
 type Client struct {
 	mconn DBConnection
@@ -193,7 +128,7 @@ func (c *Client) Open(name string, dbType DatabaseType, user, pass string) (*Dat
 // Close must be called to close all active DB connections.
 func (c *Client) Close() error {
 	if c.mconn != nil {
-		c.mconn.Close()
+		return c.mconn.Close()
 	}
 	return nil
 }
@@ -251,7 +186,7 @@ func (db *Database) Size() (int64, error) {
 // Close closes database session.
 func (db *Database) Close() error {
 	if db != nil && db.pool != nil {
-		db.pool.clear()
+		return db.pool.close()
 	}
 	return nil
 }
