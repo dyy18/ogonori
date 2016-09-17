@@ -36,11 +36,14 @@ const (
 	DECIMAL      OType = 21
 	LINKBAG      OType = 22
 	ANY          OType = 23
-	UNKNOWN      OType = 255 // driver addition
+	UNKNOWN OType = 255 // driver addition
 )
 
 // detect the int size (4 or 8 bytes)
-const intSize = unsafe.Sizeof(int(0))
+const (
+	intSize  = unsafe.Sizeof(int(0))
+	uintSize = unsafe.Sizeof(uint(1))
+)
 
 func (t OType) String() string { // do not change - it may be used as field type for SQL queries
 	switch t {
@@ -209,6 +212,8 @@ func OTypeForValue(val interface{}) (ftype OType) {
 		ftype = LINKLIST
 	case *RidBag:
 		ftype = LINKBAG
+	case time.Time:
+		ftype = DATETIME
 	// TODO: more types need to be added
 	default:
 		if isDecimal(val) {
@@ -244,6 +249,14 @@ func OTypeForValue(val interface{}) (ftype OType) {
 			} else {
 				ftype = LONG
 			}
+		case reflect.Uint:
+			if uintSize == 4 {
+				ftype = INTEGER
+			} else {
+				ftype = LONG
+			}
+		case reflect.Uint64:
+			ftype = LONG
 		case reflect.String:
 			ftype = STRING
 		case reflect.Struct:
